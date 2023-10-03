@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Smart plant monitoring system</title>
+    <!-- Add Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Add Highcharts library -->
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <style>
+        body {
+            background-image: linear-gradient(120deg, #d4fc79 0%, #96e6a1 100%);
+        }
+
+        .sidebar {
+            height: 50%;
+            width: 0;
+            position: fixed;
+            z-index: 1;
+            top: 0;
+            left: 0;
+            /* background-color: #ff9900; */
+            background: linear-gradient(180deg, #2E5E2D 0%, rgba(1, 57, 0, 0.91) 100%);
+            padding-top: 60px;
+            transition: 0.5s;
+            /* Added a slower transition */
+            overflow-x: hidden;
+        }
+
+        .sidebar a {
+            padding: 15px 25px;
+            text-align: center;
+            text-decoration: none;
+            font-size: 20px;
+            color: #343a40;
+            display: block;
+            transition: 0.3s;
+            /* Added a transition for the hover effect */
+        }
+
+        .sidebar a:hover {
+            color: #000000;
+            background-color: black;
+            /* Added background color on hover */
+        }
+
+        .sidebar .closebtn {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 20px;
+            transition: 0.3s;
+            /* Added a transition for the close button */
+        }
+
+        .main {
+            transition: margin-left 0.5s;
+            /* Added a slower transition */
+            padding: 16px;
+            margin-left: 0;
+
+        }
+
+        /* Add a media query for smaller screens */
+        @media screen and (max-height: 450px) {
+            .sidebar {
+                padding-top: 15px;
+            }
+
+            .sidebar a {
+                font-size: 18px;
+            }
+        }
+
+        /* Add custom CSS for the open sidebar */
+        .sidebar.opened {
+            width: 250px;
+        }
+
+        .main.opened {
+            margin-left: 250px;
+        }
+
+        /* Background color for the button */
+        .btn {
+            border-radius: 20px;
+            background: linear-gradient(180deg, #5EEE6D 0%, #2E5E2D 100%);
+            color: #F6F6F6;
+            font-family: Outfit;
+            font-size: 20px;
+            font-style: normal;
+            font-weight: 600;
+            line-height: normal;
+            letter-spacing: 1.098px;
+            text-transform: uppercase;
+        }
+
+        /* Hover effect for the button */
+        .btn:hover {
+            background: darkgreen;
+            /* border-color: #0056b3; */
+        }
+
+        .progress {
+            height: 30px;
+        }
+
+        /* Additional CSS for the progress bar */
+        .progress-bar {
+            background-color: #0084ff;
+            /* height: 30px; */
+            /* width:100%; */
+            color: black;
+            /* padding: 10px; */
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        /* Hover effect for custom switch labels */
+        .custom-control-label:hover {
+            cursor: pointer;
+        }
+
+        .one {
+            font-family: "Playfair Display", serif;
+            font-weight: 600;
+            font-size: 30px;
+            background: linear-gradient(180deg, #2E5E2D 0%, #023501 100%);
+            color: #FFF;
+            padding: 10px;
+            position: static;
+            line-height: 1.7em;
+            box-shadow: 0 2px 10px 0 #cac9c9;
+            text-align: center;
+            /* user-select: none; */
+            /* display: flex; */
+            /* border-left: 20px solid #ff5f00;
+            border-right: 20px solid #ff5f00; */
+            /* border-radius: 5px 55px 5px 55px; */
+        }
+
+        .one img {
+            width: 10%;
+            /* Adjust the image width as needed */
+            margin-right: 20%;
+            /* Add some spacing between the image and text */
+        }
+
+        .checkbox-large {
+            transform: scale(1.5);
+            /* Increase the size by adjusting the scale */
+        }
+
+        .col,
+        #control_mode {
+            margin-top: 30px;
+            color: #2E5E2D;
+            text-align: center;
+            font-family: Outfit;
+            font-size: 35px;
+            font-style: normal;
+            font-weight: bolder;
+        }
+
+        .checkbox-label {
+            font-size: 20px;
+            /* Adjust the font size as needed */
+        }
+
+        #pump1Controls,
+        #pump2Controls {
+            color: #060606;
+            font-family: Outfit;
+            /* font-size: 81.356px; */
+            font-style: normal;
+            font-weight: 700;
+            line-height: 100%;
+            /* 81.356px */
+            text-transform: capitalize;
+        }
+
+        .col1 {
+            text-align: center;
+        }
+
+        .col2 {
+            font-family: Outfit;
+            font-size: 25px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="one">
+        <!-- <img src="/Logo.svg" alt="logo" /> -->
+        <h1>SMART PLANT MONITORING SYSTEM</h1>
+    </div>
+
+    <div class="gradient">
+        <!-- Sidebar -->
+        <div class="sidebar" id="mySidebar">
+            <a href="javascript:void(0)" class="closebtn" style="color: white;" onclick="closeNav()">&times;</a>
+            <a class="nav-link" href="#/plant1" data-target="moistureChart1"
+                onclick="toggleChart('moistureChart1')"><span style="color: #DEE1DD;
+				font-family: Roboto;
+				
+				font-style: normal;
+				font-weight: 700;
+				line-height: normal;">Plant
+                    1</span></a>
+            <a class="nav-link" href="#/plant2" data-target="moistureChart2"
+                onclick="toggleChart('moistureChart2')"><span style="color: #DEE1DD;
+				font-family: Roboto;
+				
+				font-style: normal;
+				font-weight: 700;
+				line-height: normal;">Plant
+                    2</span></a>
+
+            <!-- Add more items for additional sensors as needed -->
+        </div>
+
+        <!-- Page content -->
+        <div class="main">
+            <button class="btn" onclick="openNav()">Main Menu</button>
+
+            <div class="row justify-content-center">
+                <div class="col-6 text-center">
+                    <label id="control_mode" for="control_mode">Pump Mode:</label>
+                    <br><input type="checkbox" id="automaticControl" name="control_mode" class="checkbox-large" checked>
+                    <span class="checkbox-label">Automatic</span>
+                    <br><input type="checkbox" id="manualControl" name="control_mode" class="checkbox-large">
+                    <span class="checkbox-label">Manual</span>
+                </div>
+
+            </div>
+
+
+            <!-- Water Level Status Progress Bar -->
+            <div class="row">
+                <div class="col">
+                    <h3 style="font-weight: bolder;">Water Level Status</h3>
+                    <div class="progress">
+                        <div class="progress-bar" id="waterLevelStatus" role="progressbar" style="width: 0%;"
+                            aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Toggle switches for pump control -->
+            <div class="col1">
+                <div class="col2" id="pump1Controls" style="display: none;">
+                    <br>
+                    <h4
+                        style="color: #060606; font-family: Outfit; font-weight: 700; font-size: 24px; line-height: 1.5; text-transform: capitalize;">
+                        Pump Control for <span style="color: #2E5E2D;
+						font-family: Outfit;
+						
+						font-style: normal;
+						font-weight: 700;
+						line-height: 100%;
+						text-transform: capitalize;">Plant 1</span></h4>
+                    <div class="custom-control custom-switch">
+                        <input type="checkbox" class="custom-control-input" id="pump1Switch">
+                        <label class="custom-control-label" for="pump1Switch">Toggle Pump 1</label><br><br>
+                    </div>
+                </div>
+                <div class="col2" id="pump2Controls" style="display: none;">
+                    <br>
+                    <h4
+                        style="color: #060606; font-family: Outfit; font-weight: 700; font-size: 24px; line-height: 1.5; text-transform: capitalize;">
+                        Pump Control for <span style="color: #2E5E2D;
+						font-family: Outfit;
+						
+						font-style: normal;
+						font-weight: 700;
+						line-height: 100%;
+						text-transform: capitalize;">Plant 2</span></h4>
+                    <div class="custom-control custom-switch">
+                        <input type="checkbox" class="custom-control-input" id="pump2Switch">
+                        <label class="custom-control-label" for="pump2Switch">Toggle Pump 2</label><br><br>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Create a Bootstrap row for the charts -->
+            <div class="row">
+                <!-- Create a Bootstrap column for Moisture 1 chart -->
+                <div class="col-md-12">
+                    <div id="moistureChart1" style="height: 300px;"></div>
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Create a Bootstrap column for Moisture 2 chart -->
+                <div class="col-md-12">
+                    <div id="moistureChart2" style="height: 300px; display: none;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        var automaticMode = true; // Automatic mode is initially checked
+        var moistureThreshold = 40;
+
+        // Event listener for automatic and manual checkboxes
+        document.getElementById('automaticControl').addEventListener('change', function () {
+            automaticMode = this.checked;
+            if (automaticMode) {
+                // If automatic mode is selected, reset the manual control
+                document.getElementById('manualControl').checked = false;
+            }
+        });
+
+        function togglePump() {
+            var moisture1 = moisture1Data[moisture1Data.length - 1];
+            var moisture2 = moisture2Data[moisture2Data.length - 1];
+
+            if (automaticMode) {
+                // If in automatic mode, check moisture thresholds
+                if (moisture1 > moistureThreshold) {
+                    // Turn on the pump if either sensor exceeds the threshold
+                    document.getElementById('pump1Switch').checked = true;
+                    fetch('/pump1/' + 'on');
+                }
+                if (moisture2 > moistureThreshold) {
+                    // Turn on the pump if either sensor exceeds the threshold
+                    document.getElementById('pump2Switch').checked = true;
+                    fetch('/pump2/' + 'on');
+                }
+                else if (moisture1 < moistureThreshold) {
+                    // Turn off the pump if moisture values are below the threshold
+                    document.getElementById('pump1Switch').checked = false;
+                    fetch('/pump1/' + 'off');
+                }
+                else if (moisture2 < moistureThreshold) {
+                    document.getElementById('pump2Switch').checked = false;
+                    fetch('/pump2/' + 'off');
+                }
+            }
+        }
+
+        document.getElementById('manualControl').addEventListener('change', function () {
+            automaticMode = !this.checked;
+            if (!automaticMode) {
+                // If manual mode is selected, reset the automatic control
+                document.getElementById('automaticControl').checked = false;
+            }
+        });
+
+        // Custom function to open the sidebar
+        function openNav() {
+            document.getElementById("mySidebar").classList.add("opened");
+            document.getElementById("main").classList.add("opened");
+        }
+
+        // Custom function to close the sidebar
+        function closeNav() {
+            document.getElementById("mySidebar").classList.remove("opened");
+            document.getElementById("main").classList.remove("opened");
+        }
+
+        // Define empty arrays to store data
+        var moisture1Data = [];
+        var moisture2Data = [];
+        var timestamps = []; // To store timestamps
+
+        // Create a Highcharts chart for Moisture 1
+        var moistureChart1 = Highcharts.chart('moistureChart1', {
+            title: {
+                text: 'Plant 1'
+            },
+            series: [{
+                name: 'Moisture',
+                data: moisture1Data
+            }],
+            xAxis: {
+                categories: timestamps,
+                title: {
+                    text: 'Time'
+                }
+            },
+            yAxis: {
+                title: {
+                    text: 'Moisture Level'
+                }
+            },
+            credits: {
+                enabled: false // Hide the Highcharts credits
+            }
+        });
+
+        // Create a Highcharts chart for Moisture 2
+        var moistureChart2 = Highcharts.chart('moistureChart2', {
+            title: {
+                text: 'Plant 2'
+            },
+            series: [{
+                name: 'Moisture',
+                data: moisture2Data
+            }],
+            xAxis: {
+                categories: timestamps,
+                title: {
+                    text: 'Time'
+                }
+            },
+            yAxis: {
+                title: {
+                    text: 'Moisture Level'
+                }
+            },
+            credits: {
+                enabled: false // Hide the Highcharts credits
+            }
+        });
+
+        function getCurrentTime() {
+            var now = new Date();
+            return now.toTimeString().split(' ')[0]; // Format as HH:MM:SS
+        }
+
+        function updateData() {
+            fetch('/data')
+                .then(response => response.json())
+                .then(data => {
+                    // Add new data points
+                    moisture1Data.push(data.moisture1);
+                    moisture2Data.push(data.moisture2);
+
+                    // Keep only the last 10 data points for each chart
+                    if (moisture1Data.length > 20) {
+                        moisture1Data.shift();
+                        moisture2Data.shift();
+                    }
+
+                    // Get the current time as a timestamp
+                    var currentTime = getCurrentTime();
+                    timestamps.push(currentTime);
+
+                    // Keep only the last 10 timestamps
+                    if (timestamps.length > 20) {
+                        timestamps.shift();
+                    }
+
+                    moistureChart1.series[0].setData(moisture1Data);
+                    moistureChart1.xAxis[0].setCategories(timestamps);
+
+                    // Update Moisture 2 chart with the latest data and timestamps
+                    moistureChart2.series[0].setData(moisture2Data);
+                    moistureChart2.xAxis[0].setCategories(timestamps);
+
+
+                    // Call togglePump to check moisture values and control the pump
+                    togglePump();
+
+                    var water_pin = data.water_pin;
+                    if (water_pin < 1) {
+                        // If the water level is low, don't turn on the pumps
+                        document.getElementById('pump1Switch').checked = false;
+                        document.getElementById('pump2Switch').checked = false;
+                        fetch('/pump2/' + 'off');
+                        fetch('/pump1/' + 'off');
+                    }
+
+                    var waterLevel = data.water_level;
+                    var waterLevelStatus = document.getElementById('waterLevelStatus');
+                    waterLevelStatus.style.width = waterLevel + '%';
+                    waterLevelStatus.textContent = waterLevel + '%';
+                });
+        }
+
+        // Function to toggle chart visibility and pump controls
+        function toggleChart(chartId) {
+            // Hide all charts and controls
+            document.getElementById('moistureChart1').style.display = 'none';
+            document.getElementById('moistureChart2').style.display = 'none';
+            document.getElementById('pump1Controls').style.display = 'none';
+            document.getElementById('pump2Controls').style.display = 'none';
+
+            // Show the selected chart and controls
+            document.getElementById(chartId).style.display = 'block';
+            if (chartId === 'moistureChart1') {
+                document.getElementById('pump1Controls').style.display = 'block';
+            } else if (chartId === 'moistureChart2') {
+                document.getElementById('pump2Controls').style.display = 'block';
+            }
+        }
+
+        // Activate "Plant 1" by default
+        toggleChart('moistureChart1');
+
+        // Add an event listener to the Pump 1 switch and Pump 2 switch to handle manual control
+        document.getElementById('pump1Switch').addEventListener('change', function () {
+            // Only perform manual control if the manual checkbox is checked
+            if (!automaticMode) {
+                // Send a request to control Pump 1
+                var action = this.checked ? 'on' : 'off';
+                fetch('/pump1/' + action);
+            }
+        });
+
+        document.getElementById('pump2Switch').addEventListener('change', function () {
+            // Only perform manual control if the manual checkbox is checked
+            if (!automaticMode) {
+                // Send a request to control Pump 2
+                var action = this.checked ? 'on' : 'off';
+                fetch('/pump2/' + action);
+            }
+        });
+
+        // Update data every 2 seconds (2000 milliseconds)
+        setInterval(updateData, 2000);
+
+        // Initial data update
+        updateData();
+    </script>
+</body>
+
+</html>
